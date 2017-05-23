@@ -1,15 +1,24 @@
 version: "3"
 services:
   db:
-    image: gdbelvin/trillian_db:latest
-    # volumes:
+    image: mysql
+    volumes:
+      - ../trillian/storage/mysql/storage.sql:/docker-entrypoint-initdb.d/storage.sql
       #   - /usr/local/var/mysql/:/var/lib/mysql
     restart: always
+    environment:
+      MYSQL_PASSWORD: zaphod
+      MYSQL_USER: test
+      MYSQL_DATABASE: test
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
 
   trillian-log:
     depends_on:
       - db
-    image: gdbelvin/trillian_log_server:latest
+    image: trillian_log_server:latest
+    build: 
+      context: ../trillian
+      dockerfile: server/trillian_log_server/Dockerfile
     restart: always
     ports:
       - "8090:8090" # rpcs
@@ -23,7 +32,10 @@ services:
   trillian-log-signer:
     depends_on:
       - db
-    image: gdbelvin/trillian_log_signer:latest
+    image: trillian_log_signer:latest
+    build: 
+      context: ../trillian
+      dockerfile: server/trillian_log_signer/Dockerfile
     restart: always
     ports:
       - "8092:8091" # metrics
@@ -36,7 +48,10 @@ services:
   trillian-map:
     depends_on:
       - db
-    image: gdbelvin/trillian_map_server:latest
+    image: trillian_map_server:latest
+    build: 
+      context: ../trillian
+      dockerfile: server/vmap/trillian_map_server/Dockerfile
     restart: always
     ports:
       - "8093:8090" # rpcs
@@ -52,7 +67,10 @@ services:
       - db
       - trillian-log
       - trillian-map
-    image: gdbelvin/keytransparency-server:latest
+    build:
+      context: .
+      dockerfile: ./cmd/keytransparency-server/Dockerfile
+    image: keytransparency-server:latest
     restart: always
     ports:
       - "8080:8080" # json & grpc
@@ -71,7 +89,10 @@ services:
       - db
       - trillian-log
       - trillian-map
-    image: gdbelvin/keytransparency-signer:latest
+    build:
+      context: .
+      dockerfile: ./cmd/keytransparency-signer/Dockerfile
+    image: keytransparency-signer:latest
     restart: always
     environment:
       LOG_ID: 8879615737060686335
