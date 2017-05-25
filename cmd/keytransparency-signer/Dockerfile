@@ -23,4 +23,5 @@ ENTRYPOINT /go/bin/keytransparency-signer \
 	--db="${DB_USER}:${DB_PASSWORD}@tcp(${DB_HOST})/${DB_DATABASE}" \
 	--period="$SIGN_PERIOD" --key="$SIGN_KEY" \
 	--log-id="$LOG_ID" --log-url="$LOG_URL" --log-key="$LOG_KEY" \
-	--map-id="$MAP_ID" --map-url="$MAP_URL" 
+	--map-id="$MAP_ID" --map-url="$MAP_URL" \
+	--alsologtostderr 

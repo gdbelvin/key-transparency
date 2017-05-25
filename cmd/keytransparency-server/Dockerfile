@@ -32,6 +32,7 @@ ENTRYPOINT /go/bin/keytransparency-server \
 	--key="$TLS_KEY_PATH" --cert="$TLS_CRT_PATH" \
 	--log-id="$LOG_ID" --log-url="$LOG_URL" \
 	--map-id="$MAP_ID" --map-url="$MAP_URL" \
+	--alsologtostderr \
 	--verbose="$VERBOSE"
 
 EXPOSE $RPC_PORT
