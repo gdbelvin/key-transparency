@@ -19,7 +19,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 
 	"github.com/google/keytransparency/core/crypto/commitments"
@@ -39,9 +38,6 @@ import (
 var (
 	// ErrNilProof occurs when the provided GetEntryResponse contains a nil proof.
 	ErrNilProof = errors.New("nil proof")
-
-	// Vlog is the verbose logger. By default it outputs to /dev/null.
-	Vlog = log.New(ioutil.Discard, "", 0)
 )
 
 // Verifier is a client helper library for verifying request and responses.
@@ -89,17 +85,17 @@ func (Verifier) VerifyCommitment(userID, appID string, in *tpb.GetEntryResponse)
 func (v *Verifier) VerifyGetEntryResponse(ctx context.Context, userID, appID string,
 	trusted *trillian.SignedLogRoot, in *tpb.GetEntryResponse) error {
 	if err := v.VerifyCommitment(userID, appID, in); err != nil {
-		Vlog.Printf("✗ Commitment verification failed.")
+		log.Printf("✗ Commitment verification failed.")
 		return fmt.Errorf("VerifyCommitment(): %v", err)
 	}
-	Vlog.Printf("✓ Commitment verified.")
+	log.Printf("✓ Commitment verified.")
 
 	index, err := v.vrf.ProofToHash(vrf.UniqueID(userID, appID), in.VrfProof)
 	if err != nil {
-		Vlog.Printf("✗ VRF verification failed.")
+		log.Printf("✗ VRF verification failed.")
 		return fmt.Errorf("vrf.ProofToHash(%v, %v): %v", userID, appID, err)
 	}
-	Vlog.Printf("✓ VRF verified.")
+	log.Printf("✓ VRF verified.")
 
 	leafProof := in.GetLeafProof()
 	if leafProof == nil {
@@ -107,10 +103,10 @@ func (v *Verifier) VerifyGetEntryResponse(ctx context.Context, userID, appID str
 	}
 
 	if err := v.tree.VerifyProof(leafProof.Inclusion, index[:], leafProof.Leaf.LeafValue, sparse.FromBytes(in.GetSmr().RootHash)); err != nil {
-		Vlog.Printf("✗ Sparse tree proof verification failed.")
+		log.Printf("✗ Sparse tree proof verification failed.")
 		return fmt.Errorf("tree.VerifyProof(): %v", err)
 	}
-	Vlog.Printf("✓ Sparse tree proof verified.")
+	log.Printf("✓ Sparse tree proof verified.")
 
 	// SignedMapRoot contains its own signature. To verify, we need to create a local
 	// copy of the object and return the object to the state it was in when signed
@@ -118,17 +114,17 @@ func (v *Verifier) VerifyGetEntryResponse(ctx context.Context, userID, appID str
 	smr := *in.GetSmr()
 	smr.Signature = nil // Remove the signature from the object to be verified.
 	if err := tcrypto.VerifyObject(v.sig, smr, in.GetSmr().Signature); err != nil {
-		Vlog.Printf("✗ Signed Map Head signature verification failed.")
+		log.Printf("✗ Signed Map Head signature verification failed.")
 		return fmt.Errorf("sig.Verify(SMR): %v", err)
 	}
-	Vlog.Printf("✓ Signed Map Head signature verified.")
+	log.Printf("✓ Signed Map Head signature verified.")
 
 	// Verify consistency proof between root and newroot.
 	// TODO(gdbelvin): Gossip root.
 	if err := v.log.VerifyRoot(trusted, in.LogRoot, in.LogConsistency); err != nil {
 		return fmt.Errorf("VerifyRoot(%v, %v): %v", in.LogRoot, in.LogConsistency, err)
 	}
-	Vlog.Printf("✓ Log root updated.")
+	log.Printf("✓ Log root updated.")
 
 	// Verify inclusion proof.
 	b, err := json.Marshal(in.GetSmr())
@@ -140,6 +136,6 @@ func (v *Verifier) VerifyGetEntryResponse(ctx context.Context, userID, appID str
 		return fmt.Errorf("VerifyInclusionAtIndex(%s, %v, _): %v",
 			b, in.GetSmr().GetMapRevision(), err)
 	}
-	Vlog.Printf("✓ Log inclusion proof verified.")
+	log.Printf("✓ Log inclusion proof verified.")
 	return nil
 }
