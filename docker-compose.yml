@@ -4,7 +4,6 @@ services:
     image: mysql
     volumes:
       - ../trillian/storage/mysql/storage.sql:/docker-entrypoint-initdb.d/storage.sql
-      #   - /usr/local/var/mysql/:/var/lib/mysql
     restart: always
     environment:
       MYSQL_PASSWORD: zaphod
@@ -21,8 +20,8 @@ services:
       dockerfile: server/trillian_log_server/Dockerfile
     restart: always
     ports:
-      - "8090:8090" # rpcs
-      - "8091:8091" # metrics
+      - "8090:8090" # RPCs
+      - "8091:8091" # Metrics
     environment:
       DB_HOST: db:3306
       DB_DATABASE: test
@@ -38,7 +37,7 @@ services:
       dockerfile: server/trillian_log_signer/Dockerfile
     restart: always
     ports:
-      - "8092:8091" # metrics
+      - "8092:8091" # Metrics
     environment:
       DB_HOST: db:3306
       DB_DATABASE: test
@@ -54,8 +53,8 @@ services:
       dockerfile: server/trillian_map_server/Dockerfile
     restart: always
     ports:
-      - "8093:8090" # rpcs
-      - "8094:8091" # metrics
+      - "8093:8090" # RPCs
+      - "8094:8091" # Metrics
     environment:
       DB_HOST: db:3306
       DB_DATABASE: test
@@ -73,11 +72,11 @@ services:
     image: keytransparency-server:latest
     restart: always
     ports:
-      - "8080:8080" # json & grpc
+      - "8080:8080" # JSON & gRPC
     environment:
-      LOG_ID: 8879615737060686335
+      LOG_ID: 8879615737060686335 # Update with trillian admin CLI.
       LOG_URL: trillian-log:8090
-      MAP_ID: 5481216947005239739
+      MAP_ID: 5481216947005239739 # Update with trillian admin CLI.
       MAP_URL: trillian-map:8090
       DB_HOST: db:3306
       DB_DATABASE: test
@@ -95,9 +94,9 @@ services:
     image: keytransparency-signer:latest
     restart: always
     environment:
-      LOG_ID: 8879615737060686335
+      LOG_ID: 8879615737060686335 # Update with trillian admin CLI.
       LOG_URL: trillian-log:8090
-      MAP_ID: 5481216947005239739
+      MAP_ID: 5481216947005239739 # Update with trillian admin CLI.
       MAP_URL: trillian-map:8090
       DB_HOST: db:3306
       DB_DATABASE: test

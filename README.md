@@ -104,7 +104,7 @@ Set `$GOPATH` variable to point to your Go workspace directory and add `$GOPATH/
 5. Run server setup 
 
   ```sh
-  ./scripts/prepare_server.sh
+./scripts/prepare_server.sh
   ```
 
   The tool will build the server binaries, generate keys, and configure the server.
@@ -114,10 +114,10 @@ Set `$GOPATH` variable to point to your Go workspace directory and add `$GOPATH/
   - `genfiles/server.crt`
   - `genfile/p256-pubkey.pem`
 
-6. Run the server and the signer using
+6. Run the trillian-map server 
 
   ```sh
-  docker-compose up -d
+docker-compose up trillian-map -d
   ```
 
 7. Provision a log and a map 
@@ -127,9 +127,9 @@ go run $GOPATH/src/github.com/google/trillian/cmd/createtree/main.go --admin_ser
 ```
 
 Set the `LOG_ID` and `MAP_ID` environment variables in `docker-compose.yml` with the output
-of these respective commands.
+of the respective commands.
 
-7. Relaunch and observe
+8. Launch the rest of the cluster and observe.
 - `docker-compose up -d`
 - `docker-compose logs --tail=0 --follow`
 - [https://localhost:8080/v1/users/foo@bar.com](https://localhost:8080/v1/users/foo@bar.com)
