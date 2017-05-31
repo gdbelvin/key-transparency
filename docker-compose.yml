@@ -51,7 +51,7 @@ services:
     image: trillian_map_server:latest
     build: 
       context: ../trillian
-      dockerfile: server/vmap/trillian_map_server/Dockerfile
+      dockerfile: server/trillian_map_server/Dockerfile
     restart: always
     ports:
       - "8093:8090" # rpcs
