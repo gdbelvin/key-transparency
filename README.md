@@ -87,6 +87,8 @@ Set `$GOPATH` variable to point to your Go workspace directory and add `$GOPATH/
 - [Etcd v3.1.3](https://github.com/coreos/etcd/releases/tag/v3.1.3).
 - [OpenSSL](https://www.openssl.org/community/binaries.html)
 - [Docker](https://docs.docker.com/engine/installation/) 
+  - Docker Engine 1.13.0+ `docker version -f '{{.Server.APIVersion}}'`
+  - Docker Compose 1.11.0+ `docker-compose --version`
 
 2. Install Key Transparency
 
