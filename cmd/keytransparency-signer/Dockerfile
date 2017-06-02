@@ -9,10 +9,9 @@ ENV MAP_ID=0 \
     MAP_URL=""
 ENV LOG_ID=0 \
     LOG_URL=localhost:8090 \
-    LOG_KEY=genfiles/trillian-log-pubkey.pem
+    LOG_KEY=../trillian/testdata/log-rpc-server.pubkey.pem
 
-ENV SIGN_PERIOD=5s \
-    SIGN_KEY=genfiles/p256-key.pem
+ENV SIGN_PERIOD=5s
 
 ADD . /go/src/github.com/google/keytransparency
 WORKDIR /go/src/github.com/google/keytransparency 

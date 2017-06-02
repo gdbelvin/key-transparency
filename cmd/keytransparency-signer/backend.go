@@ -39,6 +39,7 @@ import (
 	"github.com/google/trillian/util"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"io/ioutil"
 )
 
 var (
@@ -80,8 +81,10 @@ func newMapServer(ctx context.Context, sqldb *sql.DB, factory ctxn.Factory) (tri
 	if err != nil {
 		return nil, err
 	}
-
-	signer, err := keys.NewFromPrivatePEM(*signingKey, "")
+	glog.Errorf("GOT THIS PRIVATE KEY: %+v", *signingKey)
+	b, err := ioutil.ReadFile(*signingKey)
+	glog.Errorf("CONTENT of PRIVATE KEY: %+v", string(b))
+	signer, err := keys.NewFromPrivatePEM(string(b), "towel")
 	if err != nil {
 		return nil, err
 	}
@@ -111,6 +114,7 @@ func main() {
 		if err != nil {
 			glog.Exitf("newMapServer: %v", err)
 		}
+		glog.Errorf("YAY!\n")
 	}
 
 	// Connection to append only log

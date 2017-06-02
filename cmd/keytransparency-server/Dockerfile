@@ -1,10 +1,5 @@
 FROM golang
 
-ENV DB_USER=test \
-    DB_PASSWORD=zaphod \
-    DB_DATABASE=test \
-    DB_HOST=127.0.0.0:3306
-
 ENV HOST=0.0.0.0 \
     RPC_PORT=8080
 
@@ -28,7 +23,7 @@ RUN go get -tags="mysql" ./cmd/keytransparency-server
 ENTRYPOINT /go/bin/keytransparency-server \
 	--addr="$HOST:$RPC_PORT" \
 	--db="${DB_USER}:${DB_PASSWORD}@tcp(${DB_HOST})/${DB_DATABASE}" \
-	--vrf="$VRF_KEY_PATH" \
+	--vrf="$VRF_PRIV" \
 	--key="$TLS_KEY_PATH" --cert="$TLS_CRT_PATH" \
 	--log-id="$LOG_ID" --log-url="$LOG_URL" \
 	--map-id="$MAP_ID" --map-url="$MAP_URL" \
