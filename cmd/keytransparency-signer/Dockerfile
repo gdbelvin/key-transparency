@@ -20,7 +20,7 @@ RUN go get -tags="mysql" ./cmd/keytransparency-signer
 
 ENTRYPOINT /go/bin/keytransparency-signer \
 	--db="${DB_USER}:${DB_PASSWORD}@tcp(${DB_HOST})/${DB_DATABASE}" \
-	--period="$SIGN_PERIOD" --key="$SIGN_KEY" \
+	--period="$SIGN_PERIOD" --key="$SIGN_KEY" --password="$SIGN_KEY_PW" \
 	--log-id="$LOG_ID" --log-url="$LOG_URL" --log-key="$LOG_KEY" \
 	--map-id="$MAP_ID" --map-url="$MAP_URL" \
 	--alsologtostderr 

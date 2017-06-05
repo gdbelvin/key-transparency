@@ -5,5 +5,5 @@ kt-sig: "genfiles/p256-pubkey.pem"
 domain: "example.com"
 mapid: 0 
 kt-url: "104.199.112.76:5001"
-client-secret: "/usr/local/google/home/ismailkhoffi/go/src/github.com/google/keytransparency/client_secret_104901145519-7g9jtl8ai9c2t73at0objbkd56mso9vh.apps.googleusercontent.com.json"
-service-key: "/usr/local/google/home/ismailkhoffi/go/src/github.com/google/keytransparency/keytransparency-docker-1f04d9d8d958.json"
+-client-secret: "client_secret.json"
+-service-key: ""

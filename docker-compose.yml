@@ -37,7 +37,7 @@ services:
     build: 
       context: ../trillian
       dockerfile: server/trillian_log_signer/Dockerfile
-    restart: "no"
+    restart: always
     ports:
       - "8092:8091" # Metrics
     environment:
@@ -51,6 +51,7 @@ services:
       VRF_PRIV: /kt/vrf-key.pem
       VRF_PUB: /kt/vrf-pubkey.pem
       SIGN_KEY: /kt/p256-key.pem
+      SIGN_KEY_PW: "towel"
 
 
   trillian-map:
@@ -60,7 +61,7 @@ services:
     build: 
       context: ../trillian
       dockerfile: server/trillian_map_server/Dockerfile
-    restart: "no"
+    restart: always
     ports:
       - "8093:8090" # RPCs
       - "8094:8091" # Metrics
@@ -80,28 +81,26 @@ services:
       dockerfile: ./cmd/keytransparency-server/Dockerfile
     image: keytransparency-server:latest
     volumes:
-      - ./genfiles:/kt
-      - ../trillian/testdata/log-rpc-server.privkey.pem:/trillian/log-pubkey.pem
+      - ./genfiles/:/kt/
     restart: always
     ports:
       - "8080:8080" # JSON & gRPC
     environment:
-      LOG_ID: 4400671975458634238 # Update with trillian admin CLI.
+      LOG_ID: 8738910141447422583 # Update with trillian admin CLI.
       LOG_URL: trillian-log:8090
-      MAP_ID: 5347400520077404900 # Update with trillian admin CLI.
+      MAP_ID: 6078530097245576956 # Update with trillian admin CLI.
       MAP_URL: trillian-map:8090
       DB_HOST: db:3306
       DB_DATABASE: test
       DB_USER: test
       DB_PASSWORD: zaphod
-      GOOGLE_APPLICATION_CREDENTIALS: /kt/genfiles/service_key.json
-      KEY: /kt/genfiles/server.key
-      CERT: /kt/genfiles/server.crt
-      VRF_PRIV: /kt/genfiles/vrf-key.pem
-      VRF_PUB: /kt/genfiles/vrf-pubkey.pem
-      SIGN_KEY: /trillian/log-pubkey.pem
-      TLS_KEY_PATH: /kt/genfiles/server.key
-      TLS_CRT_PATH: /kt/genfiles/server.crt
+      GOOGLE_APPLICATION_CREDENTIALS: /kt/service_key.json
+      KEY: /kt/server.key
+      CERT: /kt/server.crt
+      VRF_PRIV: /kt/vrf-key.pem
+      VRF_PUB: /kt/vrf-pubkey.pem
+      TLS_KEY_PATH: /kt/server.key
+      TLS_CRT_PATH: /kt/server.crt
 
 
 
@@ -115,25 +114,26 @@ services:
       dockerfile: ./cmd/keytransparency-signer/Dockerfile
     image: keytransparency-signer:latest
     volumes:
-      - ./genfiles:/kt
-      - ../trillian/testdata/log-rpc-server.pubkey.pem:/logkey.pem
-      - ../trillian/testdata/log-rpc-server.privkey.pem:/trillian/log-pubkey.pem
-    restart: "no"
+      - ./genfiles/:/kt/
+      - ../trillian/testdata/:/trillian/
+    restart: always
     environment:
-      LOG_ID: 4400671975458634238 # Update with trillian admin CLI.
+      LOG_ID: 8738910141447422583 # Update with trillian admin CLI.
       LOG_URL: trillian-log:8090
-      MAP_ID: 5347400520077404900 # Update with trillian admin CLI.MAP_URL: trillian-map:8090
+      MAP_ID: 6078530097245576956 # Update with trillian admin CLI.
+      MAP_URL: trillian-map:8090
       DB_HOST: db:3306
       DB_DATABASE: test
       DB_USER: test
       DB_PASSWORD: zaphod
       GOOGLE_APPLICATION_CREDENTIALS: /kt/service_key.json
-      KEY: /kt/genfiles/server.key
-      LOG_KEY: /kt/genfiles/p256-pubkey.pem
-      CERT: /kt/genfiles/server.crt
+      KEY: /kt/server.key
+      LOG_KEY: /trillian/log-rpc-server.pubkey.pem
+      CERT: /kt/server.crt
       VRF_PRIV: /kt/genfiles/vrf-key.pem
       VRF_PUB: /kt/genfiles/vrf-pubkey.pem
-      SIGN_KEY: /trillian/log-pubkey.pem
+      SIGN_KEY: /trillian/log-rpc-server.privkey.pem
+      SIGN_KEY_PW: towel
 
 volumes:
   kt:

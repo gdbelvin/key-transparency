@@ -53,6 +53,7 @@ var (
 
 	// Info to replicate the Trillian Map Server locally.
 	signingKey = flag.String("key", "", "Path to private key PEM for STH signing")
+	signingKeyPassword = flag.String("password", "", "Password of the private key PEM file for STH signing")
 
 	// Info to send Signed Map Heads to a Trillian Log.
 	logID     = flag.Int64("log-id", 0, "Trillian Log ID")
@@ -81,10 +82,11 @@ func newMapServer(ctx context.Context, sqldb *sql.DB, factory ctxn.Factory) (tri
 	if err != nil {
 		return nil, err
 	}
-	glog.Errorf("GOT THIS PRIVATE KEY: %+v", *signingKey)
-	b, err := ioutil.ReadFile(*signingKey)
-	glog.Errorf("CONTENT of PRIVATE KEY: %+v", string(b))
-	signer, err := keys.NewFromPrivatePEM(string(b), "towel")
+	pemB, err := ioutil.ReadFile(*signingKey)
+	if err != nil {
+		return nil, err
+	}
+	signer, err := keys.NewFromPrivatePEM(string(pemB), *signingKeyPassword)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +116,6 @@ func main() {
 		if err != nil {
 			glog.Exitf("newMapServer: %v", err)
 		}
-		glog.Errorf("YAY!\n")
 	}
 
 	// Connection to append only log
