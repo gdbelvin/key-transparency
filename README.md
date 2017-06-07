@@ -122,8 +122,9 @@ docker-compose up -d trillian-map
 
 7. Provision a log and a map 
 ```sh
-go run $GOPATH/src/github.com/google/trillian/cmd/createtree/main.go --admin_server=localhost:8090 --pem_key_path=testdata/log-rpc-server.privkey.pem --pem_key_password="towel" --signature_algorithm=ECDSA --tree_type=LOG
-go run $GOPATH/src/github.com/google/trillian/cmd/createtree/main.go --admin_server=localhost:8090 --pem_key_path=testdata/log-rpc-server.privkey.pem --pem_key_password="towel" --signature_algorithm=ECDSA --tree_type=MAP
+MAP_IP=`docker inspect keytransparency_trillian-map_1 | grep -E '"IPAddress": ' | tail -n 1 | cut -d \" -f 4`
+go run $GOPATH/src/github.com/google/trillian/cmd/createtree/main.go --admin_server=$MAP_IP:8090 --pem_key_path=testdata/log-rpc-server.privkey.pem --pem_key_password="towel" --signature_algorithm=ECDSA --tree_type=LOG
+go run $GOPATH/src/github.com/google/trillian/cmd/createtree/main.go --admin_server=$MAP_IP:8090 --pem_key_path=testdata/log-rpc-server.privkey.pem --pem_key_password="towel" --signature_algorithm=ECDSA --tree_type=MAP
 ```
 
 Set the `LOG_ID` and `MAP_ID` environment variables in `docker-compose.yml` with the output
