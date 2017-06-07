@@ -117,7 +117,7 @@ Set `$GOPATH` variable to point to your Go workspace directory and add `$GOPATH/
 6. Run the trillian-map server 
 
   ```sh
-docker-compose up trillian-map -d
+docker-compose up -d trillian-map
   ```
 
 7. Provision a log and a map 

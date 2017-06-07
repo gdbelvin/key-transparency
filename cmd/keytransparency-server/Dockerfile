@@ -1,5 +1,10 @@
 FROM golang
 
+ENV DB_USER=test \
+    DB_PASSWORD=zaphod \
+    DB_DATABASE=test \
+    DB_HOST=db:3306
+
 ENV HOST=0.0.0.0 \
     RPC_PORT=8080
 
