@@ -39,7 +39,6 @@ import (
 	"github.com/google/trillian/util"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"io/ioutil"
 )
 
 var (
@@ -82,11 +81,7 @@ func newMapServer(ctx context.Context, sqldb *sql.DB, factory ctxn.Factory) (tri
 	if err != nil {
 		return nil, err
 	}
-	pemB, err := ioutil.ReadFile(*signingKey)
-	if err != nil {
-		return nil, err
-	}
-	signer, err := keys.NewFromPrivatePEM(string(pemB), *signingKeyPassword)
+	signer, err := keys.NewFromPrivatePEMFile(*signingKey, *signingKeyPassword)
 	if err != nil {
 		return nil, err
 	}

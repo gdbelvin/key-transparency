@@ -9,7 +9,7 @@ ENV HOST=0.0.0.0 \
     RPC_PORT=8080
 
 # TLS Certificate needs 0.0.0.0 to be in the SAN IP field.
-ENV VRF_KEY_PATH=genfiles/vrf-key.pem \
+ENV VRF_PRIV=genfiles/vrf-key.pem \
     TLS_KEY_PATH=genfiles/server.key \
     TLS_CRT_PATH=genfiles/server.crt
 
