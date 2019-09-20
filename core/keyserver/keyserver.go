@@ -659,7 +659,7 @@ func (s *Server) BatchQueueUserUpdate(ctx context.Context, in *pb.BatchQueueUser
 	wm, err := s.logs.Send(ctx, directory.DirectoryID, in.Updates...)
 	if st := status.Convert(err); st.Code() != codes.OK {
 		glog.Errorf("mutations.Write failed: %v", err)
-		return nil, status.Errorf(st.Code(), "Mutation write error")
+		return nil, status.Errorf(st.Code(), "Mutation write error: %v", st.Message())
 	}
 	if wm != nil {
 		watermarkWritten.Set(float64(wm.Watermark), directory.DirectoryID, fmt.Sprintf("%v", wm.LogID))
