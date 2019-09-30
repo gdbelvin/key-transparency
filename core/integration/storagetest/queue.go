@@ -15,7 +15,7 @@ import (
 	pb "github.com/google/keytransparency/core/api/v1/keytransparency_go_proto"
 )
 
-// Queuer writes batch definitions to storage.
+// Queuer writes items to the queue.
 type Queuer interface {
 	keyserver.MutationLogs
 	adminserver.LogsAdmin
@@ -31,8 +31,9 @@ func RunQueueStorageTests(t *testing.T, factory QueueStorageFactory) {
 	b := &QueueTests{}
 	for name, f := range map[string]QueueStorageTest{
 		// TODO(gbelvin): Discover test methods via reflection.
-		"TestSetWritable": b.TestSetWritable,
-		"TestReadLog":     b.TestReadLog,
+		"TestSetWritable":      b.TestSetWritable,
+		"TestReadLog":          b.TestReadLog,
+		"TestConcurrentWrites": b.TestConcurrentWrites,
 	} {
 		t.Run(name, func(t *testing.T) { f(ctx, t, factory) })
 	}
@@ -97,6 +98,36 @@ func mustMarshal(t *testing.T, p proto.Message) []byte {
 
 func (QueueTests) TestReadLog(ctx context.Context, t *testing.T, newForTest QueueStorageFactory) {
 	directoryID := "TestReadLog"
+	logID := int64(5)
+	m := newForTest(ctx, t, directoryID, logID)
+	for i := byte(0); i < 10; i++ {
+		entry := &pb.EntryUpdate{Mutation: &pb.SignedEntry{Entry: mustMarshal(t, &pb.Entry{Index: []byte{i}})}}
+		if _, err := m.Send(ctx, directoryID, entry, entry, entry); err != nil {
+			t.Fatalf("Send(): %v", err)
+		}
+	}
+
+	for _, tc := range []struct {
+		batchSize int32
+		count     int
+	}{
+		{batchSize: 0, count: 0},
+		{batchSize: 1, count: 3},
+		{batchSize: 4, count: 6},
+		{batchSize: 100, count: 30},
+	} {
+		rows, err := m.ReadLog(ctx, directoryID, logID, 0, time.Now().UnixNano(), tc.batchSize)
+		if err != nil {
+			t.Fatalf("ReadLog(%v): %v", tc.batchSize, err)
+		}
+		if got, want := len(rows), tc.count; got != want {
+			t.Fatalf("ReadLog(%v): len: %v, want %v", tc.batchSize, got, want)
+		}
+	}
+}
+
+func (QueueTests) TestConcurrentWrites(ctx context.Context, t *testing.T, newForTest QueueStorageFactory) {
+	directoryID := "ConcurrentWrites"
 	logID := int64(5)
 	m := newForTest(ctx, t, directoryID, logID)
 	for i := byte(0); i < 10; i++ {

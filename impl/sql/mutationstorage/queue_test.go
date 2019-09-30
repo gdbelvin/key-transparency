@@ -29,7 +29,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func mutationFactory(ctx context.Context, t *testing.T, dirID string, logIDs ...int64) storagetest.Queuer {
+func queueFactory(ctx context.Context, t *testing.T, dirID string, logIDs ...int64) storagetest.Queuer {
 	return newForTest(ctx, t, dirID, logIDs...)
 }
 
@@ -45,7 +45,7 @@ func newForTest(ctx context.Context, t testing.TB, dirID string, logIDs ...int64
 }
 
 func TestQueueIntegration(t *testing.T) {
-	storagetest.RunQueueStorageTests(t, mutationFactory)
+	storagetest.RunQueueStorageTests(t, queueFactory)
 }
 
 func TestRandLog(t *testing.T) {
