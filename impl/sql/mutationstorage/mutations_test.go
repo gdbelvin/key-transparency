@@ -24,7 +24,9 @@ import (
 )
 
 func newDB(t testing.TB) *sql.DB {
-	db, err := sql.Open("sqlite3", ":memory:")
+	// See https://github.com/mattn/go-sqlite3#faq
+	// Why is it racy if I use a sql.Open("sqlite3", ":memory:") database?
+	db, err := sql.Open("sqlite3", "file::memory:?cache=shared")
 	if err != nil {
 		t.Fatalf("sql.Open(): %v", err)
 	}
