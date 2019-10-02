@@ -17,6 +17,8 @@ package mutationstorage
 import (
 	"fmt"
 
+	"github.com/VividCortex/mysqlerr"
+	"github.com/go-sql-driver/mysql"
 	"github.com/mattn/go-sqlite3"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -38,6 +40,16 @@ func dbErrorf(err error, format string, a ...interface{}) error {
 		case sqlite3.ErrBusy:
 			fallthrough
 		case sqlite3.ErrLocked:
+			code = codes.Aborted
+		default:
+			code = codes.Internal
+		}
+		return status.Errorf(code, "%v: %v", msg, err)
+	}
+	if mysqlErr, ok := err.(*mysql.MySQLError); ok {
+		code := codes.OK
+		switch mysqlErr.Number {
+		case mysqlerr.ER_LOCK_DEADLOCK:
 			code = codes.Aborted
 		default:
 			code = codes.Internal

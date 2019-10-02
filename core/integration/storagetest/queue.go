@@ -135,7 +135,7 @@ func (QueueTests) TestConcurrentWrites(ctx context.Context, t *testing.T, newFor
 	directoryID := "ConcurrentWrites"
 	logID := int64(5)
 	m := newForTest(ctx, t, directoryID, logID)
-	for i, concurrency := range []int{1, 2, 4, 8, 16, 32, 64, 512} {
+	for i, concurrency := range []int{1, 2, 4, 8, 16, 32, 64} {
 		var g errgroup.Group
 		entry := makeEntryUpdate(t, i)
 		for i := 0; i < concurrency; i++ {

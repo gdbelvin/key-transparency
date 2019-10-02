@@ -27,6 +27,7 @@ func newDB(t testing.TB) *sql.DB {
 	// See https://github.com/mattn/go-sqlite3#faq
 	// Why is it racy if I use a sql.Open("sqlite3", ":memory:") database?
 	db, err := sql.Open("sqlite3", "file::memory:?cache=shared")
+	//db, _, err := testdb.NewTrillianDB(context.Background()) // Mysql test
 	if err != nil {
 		t.Fatalf("sql.Open(): %v", err)
 	}
