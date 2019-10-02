@@ -9,6 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/keytransparency/core/adminserver"
 	"github.com/google/keytransparency/core/keyserver"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -96,12 +97,16 @@ func mustMarshal(t *testing.T, p proto.Message) []byte {
 	return b
 }
 
+func makeEntryUpdate(t *testing.T, i int) *pb.EntryUpdate {
+	return &pb.EntryUpdate{Mutation: &pb.SignedEntry{Entry: mustMarshal(t, &pb.Entry{Index: []byte{byte(i)}})}}
+}
+
 func (QueueTests) TestReadLog(ctx context.Context, t *testing.T, newForTest QueueStorageFactory) {
 	directoryID := "TestReadLog"
 	logID := int64(5)
 	m := newForTest(ctx, t, directoryID, logID)
-	for i := byte(0); i < 10; i++ {
-		entry := &pb.EntryUpdate{Mutation: &pb.SignedEntry{Entry: mustMarshal(t, &pb.Entry{Index: []byte{i}})}}
+	for i := 0; i < 10; i++ {
+		entry := makeEntryUpdate(t, i)
 		if _, err := m.Send(ctx, directoryID, entry, entry, entry); err != nil {
 			t.Fatalf("Send(): %v", err)
 		}
@@ -130,28 +135,17 @@ func (QueueTests) TestConcurrentWrites(ctx context.Context, t *testing.T, newFor
 	directoryID := "ConcurrentWrites"
 	logID := int64(5)
 	m := newForTest(ctx, t, directoryID, logID)
-	for i := byte(0); i < 10; i++ {
-		entry := &pb.EntryUpdate{Mutation: &pb.SignedEntry{Entry: mustMarshal(t, &pb.Entry{Index: []byte{i}})}}
-		if _, err := m.Send(ctx, directoryID, entry, entry, entry); err != nil {
-			t.Fatalf("Send(): %v", err)
+	for i, concurrency := range []int{1, 2, 4, 8, 16, 32, 64, 512} {
+		var g errgroup.Group
+		entry := makeEntryUpdate(t, i)
+		for i := 0; i < concurrency; i++ {
+			g.Go(func() error {
+				_, err := m.Send(ctx, directoryID, entry)
+				return err
+			})
 		}
-	}
-
-	for _, tc := range []struct {
-		batchSize int32
-		count     int
-	}{
-		{batchSize: 0, count: 0},
-		{batchSize: 1, count: 3},
-		{batchSize: 4, count: 6},
-		{batchSize: 100, count: 30},
-	} {
-		rows, err := m.ReadLog(ctx, directoryID, logID, 0, time.Now().UnixNano(), tc.batchSize)
-		if err != nil {
-			t.Fatalf("ReadLog(%v): %v", tc.batchSize, err)
-		}
-		if got, want := len(rows), tc.count; got != want {
-			t.Fatalf("ReadLog(%v): len: %v, want %v", tc.batchSize, got, want)
+		if err := g.Wait(); err != nil {
+			t.Errorf("concurrency: %d, err: %v", concurrency, err)
 		}
 	}
 }
