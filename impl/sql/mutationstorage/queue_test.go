@@ -50,7 +50,6 @@ func TestQueueIntegration(t *testing.T) {
 
 func TestRandLog(t *testing.T) {
 	ctx := context.Background()
-	directoryID := "TestRandLog"
 
 	for _, tc := range []struct {
 		desc     string
@@ -67,6 +66,7 @@ func TestRandLog(t *testing.T) {
 		}},
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
+			directoryID := fmt.Sprintf("%v-%v", "TestRandLog", tc.desc)
 			m := newForTest(ctx, t, directoryID, tc.send...)
 			logs := make(map[int64]bool)
 			for i := 0; i < 10*len(tc.wantLogs); i++ {

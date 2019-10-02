@@ -102,7 +102,7 @@ func (*BatchTests) TestReadBatch(ctx context.Context, t *testing.T, f BatchStora
 }
 
 func (*BatchTests) TestHighestRev(ctx context.Context, t *testing.T, f BatchStorageFactory) {
-	domainID := "writebatchtest"
+	domainID := "writehighestrev"
 	b := f(ctx, t, domainID)
 	for _, tc := range []struct {
 		rev     int64

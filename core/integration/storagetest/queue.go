@@ -2,6 +2,7 @@ package storagetest
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -44,7 +45,6 @@ func RunQueueStorageTests(t *testing.T, factory QueueStorageFactory) {
 type QueueTests struct{}
 
 func (QueueTests) TestSetWritable(ctx context.Context, t *testing.T, f QueueStorageFactory) {
-	directoryID := "TestSetWritable"
 	for _, tc := range []struct {
 		desc       string
 		logIDs     []int64
@@ -58,6 +58,7 @@ func (QueueTests) TestSetWritable(ctx context.Context, t *testing.T, f QueueStor
 		{desc: "multi", logIDs: []int64{1, 2, 3}, set: map[int64]bool{1: true, 2: false}, wantLogIDs: []int64{1, 3}},
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
+			directoryID := fmt.Sprintf("%v-%v", "TestSetWritable", tc.desc)
 			m := f(ctx, t, directoryID, tc.logIDs...)
 			wantLogs := make(map[int64]bool)
 			for _, logID := range tc.wantLogIDs {
