@@ -42,6 +42,10 @@ func fakeMetric(_ string) {}
 // fakeLogs are indexed by logID, and nanoseconds from time 0
 type fakeLogs map[int64][]mutator.LogMessage
 
+func init() {
+	initMetrics.Do(func() { createMetrics(monitoring.InertMetricFactory{}) })
+}
+
 func (l fakeLogs) ReadLog(ctx context.Context, directoryID string, logID int64, low, high time.Time,
 	batchSize int32) ([]*mutator.LogMessage, error) {
 	refs := make([]*mutator.LogMessage, 0)
@@ -130,7 +134,6 @@ func TestDefiningRevisions(t *testing.T) {
 	// Verify that outstanding revisions prevent future revisions from being created.
 	ctx := context.Background()
 	mapRev := int64(2)
-	initMetrics.Do(func() { createMetrics(monitoring.InertMetricFactory{}) })
 	s := Server{
 		logs: fakeLogs{
 			0: make([]mutator.LogMessage, 10),
