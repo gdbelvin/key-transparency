@@ -1,5 +1,7 @@
 # Key Transparency
 
+TEST
+
 [![GoDoc](https://godoc.org/github.com/google/keytransparency?status.svg)](https://godoc.org/github.com/google/keytransparency)
 [![Build Status](https://travis-ci.com/google/keytransparency.svg?branch=master)](https://travis-ci.com/google/keytransparency)
 [![Go Report Card](https://goreportcard.com/badge/github.com/google/keytransparency)](https://goreportcard.com/report/github.com/google/keytransparency)
